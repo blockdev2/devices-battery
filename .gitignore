@@ -1,0 +1,4 @@
+*.exe
+*.exe.new
+*.exe.old
+*.pdb
