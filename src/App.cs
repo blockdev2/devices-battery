@@ -12,8 +12,8 @@ using Microsoft.Win32;
 [assembly: AssemblyTitle("Devices Battery")]
 [assembly: AssemblyProduct("Devices Battery")]
 [assembly: AssemblyDescription("Battery level of wireless mice and headsets in the Windows taskbar")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.0.2.0")]
+[assembly: AssemblyFileVersion("1.0.2.0")]
 
 static class Scanner
 {

@@ -230,7 +230,7 @@ static class Logitech
         }
     }
 
-    // PRO X 2 LIGHTSPEED: 51 08 00 03 1A 00 03 00 04 0A -> reply 51 0B 00 03 10 00 06 00 04 0A <pct>.
+    // PRO X 2 LIGHTSPEED: 51 08 00 03 1A 00 03 00 04 0A -> reply 51 0B 00 03 10 00 06 00 04 0A <pct> <pct> <charging>.
     static void ProX2(PollContext ctx)
     {
         foreach (var c in ctx.Find(0x046D, 0x0AF7, delegate (HidColl x) { return x.Page == 0xFFA0 && x.OutLen == 64; }))
@@ -242,7 +242,8 @@ static class Logitech
                     r = d.Request(new byte[] { 0x51, 0x08, 0x00, 0x03, 0x1A, 0x00, 0x03, 0x00, 0x04, 0x0A }, 1000,
                         delegate (byte[] x) { return x.Length > 10 && x[0] == 0x51 && x[1] == 0x0B && x[8] == 0x04 && x[9] == 0x0A; });
                 if (r == null || r[10] > 100) continue; // headset off: the dongle stays silent
-                ctx.Add(new Reading { Key = "logi:0AF7", Name = "PRO X 2 LIGHTSPEED", Percent = r[10], Headset = true }, 0x046D, 0x0AF7);
+                // r[12]: 02 on the charging cable, 00 on battery (verified on hardware by plugging/unplugging)
+                ctx.Add(new Reading { Key = "logi:0AF7", Name = "PRO X 2 LIGHTSPEED", Percent = r[10], Charging = r[12] != 0, Headset = true }, 0x046D, 0x0AF7);
                 return;
             }
     }
