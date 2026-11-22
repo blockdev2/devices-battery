@@ -12,8 +12,8 @@ using Microsoft.Win32;
 [assembly: AssemblyTitle("Devices Battery")]
 [assembly: AssemblyProduct("Devices Battery")]
 [assembly: AssemblyDescription("Battery level of wireless mice and headsets in the Windows taskbar")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 
 static class Scanner
 {
@@ -50,6 +50,7 @@ class TrayApp : ApplicationContext
     public TrayApp()
     {
         ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
+        FixStartupPath();
         widget = new Widget(BuildMenu());
         widget.RefreshRequested += Refresh;
         widget.Show();
@@ -84,6 +85,18 @@ class TrayApp : ApplicationContext
     {
         using (var k = Registry.CurrentUser.OpenSubKey(RunKey)) return k != null && k.GetValue(RunName) != null;
     }
+    // If "Start with Windows" is on but points to another copy of the exe (moved, renamed, an old folder),
+    // point it at this one; otherwise Windows keeps launching a file that may no longer exist.
+    static void FixStartupPath()
+    {
+        using (var k = Registry.CurrentUser.OpenSubKey(RunKey, true))
+        {
+            string want = "\"" + Application.ExecutablePath + "\"";
+            var cur = k == null ? null : k.GetValue(RunName) as string;
+            if (cur != null && !string.Equals(cur, want, StringComparison.OrdinalIgnoreCase)) k.SetValue(RunName, want);
+        }
+    }
+
     static void ToggleStartup()
     {
         using (var k = Registry.CurrentUser.CreateSubKey(RunKey))
